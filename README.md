@@ -123,8 +123,7 @@ cd Cassiopeia
 ```
 
 ### 2. Make Executable
-```bash
-chmod +x cassiopeia.sh
+```python
 chmod +x launcher.py
 ```
 
@@ -165,7 +164,7 @@ python3 cassiopeia.py pentest_target.com_20250101_120000
 nano ~/.cassiopeia.conf
 
 # Then run
-sudo bash cassiopeia.sh
+python3 cassiopeia.py
 ```
 
 ### Target URL Format
