@@ -94,7 +94,7 @@
 
 ### Operating System
 - **Arch Linux** (Required)
-- **Garuda Linux** (Recommended)
+- **BlackArch Linux** (Recommended)
 - Other Arch-based distros: Manjaro, EndeavourOS, Artix, BlackArch, CachyOS
 
 > ⚠️ **Other Linux distributions are NOT supported** and may cause errors.
