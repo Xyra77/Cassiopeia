@@ -342,10 +342,10 @@ Thanks to all open-source tool developers whose projects are integrated into Cas
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 4.0.0 | 2025 | Full rewrite, 15 phases, Caido integration, HTML/PDF report |
-| 3.0.0 | 2024 | Added browser XSS, prototype pollution, race condition |
-| 2.0.0 | 2023 | Added Nuclei, Metasploit automation |
-| 1.0.0 | 2022 | Initial release |
+| 4.0.0 | 2026 March    | Full rewrite, 15 phases, Caido integration, HTML/PDF report |
+| 3.0.0 | 2025 Desember | Added browser XSS, prototype pollution, race condition |
+| 2.0.0 | 2025 November | Added Nuclei, Metasploit automation |
+| 1.0.0 | 2025 June     | Initial release |
 
 ---
 
@@ -354,5 +354,5 @@ Thanks to all open-source tool developers whose projects are integrated into Cas
 ---
 
 **Developer:** Xyra77  
-**Last Updated:** 2025  
+**Last Updated:** 2026  
 **Status:** Active Development
