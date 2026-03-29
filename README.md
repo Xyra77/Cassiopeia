@@ -118,7 +118,7 @@ python3 nodejs npm playwright
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/Cassiopeia.git
+git clone https://github.com/Xyra77/Cassiopeia.git
 cd Cassiopeia
 ```
 
@@ -140,8 +140,8 @@ playwright install chromium
 ```
 
 ### 5. Run Cassiopeia
-```bash
-sudo bash cassiopeia.sh
+```python
+python3 cassiopeia.py
 ```
 
 ---
@@ -150,13 +150,13 @@ sudo bash cassiopeia.sh
 
 ### Basic Scan
 ```bash
-sudo bash cassiopeia.sh
+python3 cassiopeia.py
 # Enter target URL when prompted
 ```
 
 ### Resume Interrupted Scan
 ```bash
-sudo bash cassiopeia.sh pentest_target.com_20250101_120000
+python3 cassiopeia.py pentest_target.com_20250101_120000
 ```
 
 ### With Config File
