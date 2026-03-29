@@ -126,8 +126,7 @@ cd Cassiopeia
 
 ### 2. Make Executable
 ```bash
-chmod +x launcher.py
-chmod +x cassiopeia.sh
+chmod +x cassiopeia.py
 ```
 
 ### 3. Install System Dependencies
@@ -143,7 +142,7 @@ playwright install chromium
 
 ### 5. Run Cassiopeia (via Python Launcher)
 ```bash
-sudo python3 launcher.py
+sudo python3 cassiopeia.py
 ```
 
 ---
@@ -152,13 +151,13 @@ sudo python3 launcher.py
 
 ### Basic Scan
 ```bash
-sudo python3 launcher.py
+sudo python3 cassiopeia.py
 # Enter target URL when prompted
 ```
 
 ### Resume Interrupted Scan
 ```bash
-sudo python3 launcher.py pentest_target.com_20250101_120000
+sudo python3 cassiopeia.py pentest_target.com_20250101_120000
 ```
 
 ### With Config File
@@ -167,7 +166,7 @@ sudo python3 launcher.py pentest_target.com_20250101_120000
 nano ~/.cassiopeia.conf
 
 # Then run
-sudo python3 launcher.py
+sudo python3 cassiopeia.py
 ```
 
 ### Target URL Format
@@ -179,7 +178,7 @@ http://subdomain.target.com
 
 ### Launcher Help
 ```bash
-python3 launcher.py --help
+python3 cassiopeia.py --help
 ```
 
 ---
