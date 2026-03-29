@@ -1,10 +1,3 @@
-██████╗ █████╗ ███████╗███████╗██╗ ██████╗ ██████╗ ███████╗██╗ █████╗
-██╔════╝██╔══██╗██╔════╝██╔════╝██║██╔═══██╗██╔══██╗██╔════╝██║██╔══██╗
-██║     ███████║███████╗███████╗██║██║   ██║██████╔╝█████╗  ██║███████║
-██║     ██╔══██║╚════██║╚════██║██║██║   ██║██╔═══╝ ██╔══╝  ██║██╔══██║
-╚██████╗██║  ██║███████║███████║██║╚██████╔╝██║     ███████╗██║██║  ██║
-╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝ ╚═════╝ ╚═╝     ╚══════╝╚═╝╚═╝  ╚═╝ 
-
 # 🛡️ Cassiopeia Pentest Framework
 
 > ⚠️ **LEGAL DISCLAIMER — AUTHORIZED USE ONLY**
@@ -22,9 +15,18 @@
 
 **Cassiopeia** is an all-in-one automated penetration testing framework designed for **Arch Linux / Garuda Linux** environments. It streamlines the entire security assessment workflow from OPSEC setup to final reporting with **40+ integrated tools** across **15+ phases**.
 
+```
+██████╗ █████╗ ███████╗███████╗██╗ ██████╗ ██████╗ ███████╗██╗ █████╗
+██╔════╝██╔══██╗██╔════╝██╔════╝██║██╔═══██╗██╔══██╗██╔════╝██║██╔══██╗
+██║     ███████║███████╗███████╗██║██║   ██║██████╔╝█████╗  ██║███████║
+██║     ██╔══██║╚════██║╚════██║██║██║   ██║██╔═══╝ ██╔══╝  ██║██╔══██║
+╚██████╗██║  ██║███████║███████║██║╚██████╔╝██║     ███████╗██║██║  ██║
+╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝ ╚═════╝ ╚═╝     ╚══════╝╚═╝╚═╝  ╚═╝
+```
+
 **Version:** 4.0.0  
 **Developer:** Xyra77  
-**Platform:** Arch Linux / Garuda Linux (Required)  
+**Platform:** Arch Linux (Required)  
 **License:** MIT License
 
 ---
@@ -123,8 +125,9 @@ cd Cassiopeia
 ```
 
 ### 2. Make Executable
-```python
+```bash
 chmod +x launcher.py
+chmod +x cassiopeia.sh
 ```
 
 ### 3. Install System Dependencies
@@ -138,9 +141,9 @@ pip3 install requests cloudscraper playwright reportlab weasyprint
 playwright install chromium
 ```
 
-### 5. Run Cassiopeia
-```python
-python3 cassiopeia.py
+### 5. Run Cassiopeia (via Python Launcher)
+```bash
+sudo python3 launcher.py
 ```
 
 ---
@@ -149,13 +152,13 @@ python3 cassiopeia.py
 
 ### Basic Scan
 ```bash
-python3 cassiopeia.py
+sudo python3 launcher.py
 # Enter target URL when prompted
 ```
 
 ### Resume Interrupted Scan
 ```bash
-python3 cassiopeia.py pentest_target.com_20250101_120000
+sudo python3 launcher.py pentest_target.com_20250101_120000
 ```
 
 ### With Config File
@@ -164,7 +167,7 @@ python3 cassiopeia.py pentest_target.com_20250101_120000
 nano ~/.cassiopeia.conf
 
 # Then run
-python3 cassiopeia.py
+sudo python3 launcher.py
 ```
 
 ### Target URL Format
@@ -172,6 +175,11 @@ python3 cassiopeia.py
 https://target.com
 https://www.target.com
 http://subdomain.target.com
+```
+
+### Launcher Help
+```bash
+python3 launcher.py --help
 ```
 
 ---
@@ -341,10 +349,10 @@ Thanks to all open-source tool developers whose projects are integrated into Cas
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 4.0.0 | 2026 March    | Full rewrite, 15 phases, Caido integration, HTML/PDF report |
-| 3.0.0 | 2025 Desember | Added browser XSS, prototype pollution, race condition |
+| 4.0.0 | 2026 March | Full rewrite, 15 phases, Caido integration, HTML/PDF report, Python launcher |
+| 3.0.0 | 2025 December | Added browser XSS, prototype pollution, race condition |
 | 2.0.0 | 2025 November | Added Nuclei, Metasploit automation |
-| 1.0.0 | 2025 June     | Initial release |
+| 1.0.0 | 2025 June | Initial release |
 
 ---
 
@@ -354,4 +362,4 @@ Thanks to all open-source tool developers whose projects are integrated into Cas
 
 **Developer:** Xyra77  
 **Last Updated:** 2026  
-**Status:** Active Development
+**Status:** Cyber Security Enthusiast
