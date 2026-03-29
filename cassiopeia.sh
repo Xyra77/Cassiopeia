@@ -51,7 +51,7 @@ cat << 'ALERTBANNER'
 |       The developer assumes NO responsibility for misuse.        |
 |                                                                  |
 |   [2] PLATFORM REQUIREMENT                                       |
-|       Cassiopeia is designed for Arch Linux / Garuda Linux.      |
+|       Cassiopeia is designed for Arch Linux.                     |
 |       Other distros are NOT supported and may cause errors.      |
 |                                                                  |
 |   [3] ROOT REQUIRED                                              |
