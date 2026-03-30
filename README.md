@@ -327,7 +327,7 @@ SOFTWARE.
 
 ## 📞 Support
 
-- **Issues:** Open an issue on GitHub
+- **Issues:** Xyra77@proton.me
 - **Updates:** Check repository for latest version
 - **Community:** For educational discussion only
 
