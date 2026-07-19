@@ -13,7 +13,7 @@
 
 ## 📜 Overview
 
-**Cassiopeia** is an all-in-one automated penetration testing framework designed for **Arch Linux / Garuda Linux** environments. It streamlines the entire security assessment workflow from OPSEC setup to final reporting with **40+ integrated tools** across **15+ phases**.
+**Cassiopeia** is an all-in-one automated Bash penetration testing framework (~4,000+ lines) that runs the full assessment pipeline — **OPSEC → Recon/Pentest → Advanced Addons → Report → Caido handoff** — in a single script, with **40+ integrated tools** across **15+ phases** plus a set of advanced addon modules.
 
 ```
  ██████╗ █████╗ ███████╗███████╗██╗ ██████╗ ██████╗ ███████╗██╗ █████╗
@@ -24,23 +24,23 @@
  ╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝ ╚═════╝ ╚═╝     ╚══════╝╚═╝╚═╝  ╚═╝
 ```
 
-**Version:** 4.0.0  
-**Developer:** Xyra77  
-**Platform:** Arch Linux (Required)  
+**Version:** 4.0.0
+**Developer:** [Xyra77](https://github.com/Xyra77)
+**Repository:** [github.com/Xyra77/Cassiopeia](https://github.com/Xyra77/Cassiopeia.git)
+**Platform:** Arch-based Linux (primary) + Debian-based Linux (auto-detected)
 **License:** MIT License
+**Distribution:** Signed launcher (GPG-verified, tamper-proof execution)
 
 ---
 
 ## 🚀 Features
 
-### 🔐 OPSEC & Anonymity
+### 🔐 OPSEC & Anonymity (Section 1)
 - Tor + ProxyChains automatic configuration
 - MAC address spoofing
-- IP rotation during scan
-- DNS leak protection
-- Real IP masking
+- Real IP masking / IP-via-Tor verification
 
-### 🔍 Reconnaissance (15+ Phases)
+### 🔍 Main Pentest — 15 Phases, 40+ Tools (Section 2)
 | Phase | Description |
 |-------|-------------|
 | Phase 1 | OSINT & Passive Recon (theHarvester, Shodan, GitLeaks) |
@@ -48,71 +48,102 @@
 | Phase 3 | Port & Service Scanning (Masscan, Nmap, testssl.sh) |
 | Phase 4 | Fingerprinting & WAF Detection (WhatWeb, WAFW00F) |
 | Phase 5 | URL & Parameter Discovery (GAU, Katana, Gospider, Arjun) |
-| Phase 6 | Directory Fuzzing (FFUF, Gobuster, Feroxbuster, Nikto) |
-| Phase 7 | XSS Hunting (Dalfox, KXSS, CRLFuzz) |
+| Phase 6 | Directory & File Fuzzing (FFUF, Gobuster, Feroxbuster, Nikto) |
+| Phase 7 | XSS Hunting (Dalfox, KXSS) |
 | Phase 8 | SQL Injection (SQLMap automated) |
 | Phase 9 | SSRF Detection |
 | Phase 10 | LFI / Path Traversal |
 | Phase 11 | SSTI / XXE / RCE |
 | Phase 12 | CORS / HTTP Smuggling / JWT |
 | Phase 13 | GraphQL & API Discovery |
-| Phase 14 | Nuclei Vulnerability Scan |
+| Phase 14 | Nuclei Ultra Scan |
 | Phase 15 | Metasploit Automation |
 
-### 🧩 Advanced Addons
-- Prototype Pollution detection
-- Code Injection (PHP, Python, NodeJS)
-- Browser-based XSS verification (Playwright headless)
-- JavaScript Secret Hunting (API keys, tokens, credentials)
-- 403 Bypass testing
-- Subdomain Takeover check
-- Race Condition testing
-- WebSocket security test
-- Password Spraying (login endpoints)
-- Open Redirect chaining
-- JWT Brute Force & None algorithm attack
+### 🧩 Advanced Pentest Addons (Section 3)
+- Addon A — Prototype Pollution detection
+- Addon B — Code Injection (PHP, Python, NodeJS)
+- Addon C — Real Browser XSS verification (headless Playwright)
+- Addon D — JavaScript Secret Hunting (API keys, tokens, credentials)
+- Addon F — CVE Correlation
+- Upgrade P1 — Anti False-Positive Verification (OAST re-check)
+- Upgrade P2 — Coverage Enhancements: live-host screenshots, subdomain takeover check, 403 bypass testing, API discovery, parameter mining from JS
+- Upgrade P6 — Race Condition + WebSocket security + Password Spraying
 
-### 📊 Reporting
-- HTML Report with interactive charts (Chart.js)
-- PDF Export (via WeasyPrint or Chromium)
-- CVSS Scoring for all findings
-- OWASP Top 10 2021 mapping
-- Risk Breakdown (Critical, High, Medium, Low, Info)
-- Remediation Recommendations per vulnerability
-- Caido Integration — auto-send findings for manual testing
+### 📊 Reporting (Section 4)
+- Self-contained HTML report with interactive charts
+- PDF export (WeasyPrint → Chromium/Chrome headless fallback)
+- Full audit trail via `master_log.txt`
+
+### 🔗 Caido Integration
+- Auto-detects a running Caido instance (`127.0.0.1:8080`) and offers to start it
+- Replays all discovered URLs through the Caido proxy for manual testing
+- Sends verified findings (XSS, LFI, SSRF, 403 bypass, API endpoints) tagged `X-Cassiopeia-Source: verified-finding`
+- Auto-opens the Caido GUI (`http://127.0.0.1:7777`)
 
 ### ⚡ Smart Features
-- Time Budget System — Max 6 hours with Turbo Mode
-- Auto Resume — Continue from interrupted scans
-- Smart Skip — Skip completed phases/tools
-- Cloudflare Bypass mode
-- False Positive Verification — Re-verify findings with OAST
+- Auto OS detection (Arch-based vs Debian-based) with matching package manager (`pacman` / `apt`)
+- Auto-install missing tools via native package repos, with `go install` / `pipx` / `cargo` / `git clone` fallbacks
+- Resume mode — continue an interrupted scan from its existing output directory
+- Colorized, phased console output with per-phase notifications
 
 ---
 
 ## 📋 Requirements
 
 ### Operating System
-- **Arch Linux** (Required)
-- **BlackArch Linux** (Recommended)
-- Other Arch-based distros: Manjaro, EndeavourOS, Artix, BlackArch, CachyOS
-
-> ⚠️ **Other Linux distributions are NOT supported** and may cause errors.
+- **Arch-based**: Arch, Garuda, Manjaro, EndeavourOS, Artix, BlackArch, CachyOS, Archcraft, ArcoLinux
+- **Debian-based**: Debian, Ubuntu, Kali, Parrot, Linux Mint, Pop!_OS, Raspbian, Zorin, Neon
+- OS family is auto-detected via `/etc/os-release`; unsupported OSes get a warning prompt before continuing
 
 ### Permissions
 - **Root access** (`sudo`) required for full functionality
 
-### Dependencies (Auto-installed)
-```bash
-tor proxychains-ng curl netcat macchanger
-nmap masscan whatweb wafw00f wpscan nikto testssl.sh
-subfinder amass assetfinder httpx dnsx gau waybackurls
-hakrawler katana gospider paramspider arjun ffuf gobuster feroxbuster
-dalfox kxss sqlmap nuclei msfconsole tplmap commix crlfuzz
-theharvester shodan gitleaks s3scanner fierce dnsrecon gf cariddi
-gowitness aquatone subjack subzy interactsh-client
-python3 nodejs npm playwright
+### Launcher Requirements
+- **Python 3** (runs `cassiopeia.py`)
+- **GPG** (`gnupg`) available on `PATH` — used by the launcher to verify the script signature before execution
+
+### Dependencies (auto-installed on first run)
 ```
+nmap masscan whatweb wafw00f wpscan nikto testssl.sh curl
+subfinder amass assetfinder httpx dnsx gau waybackurls hakrawler
+katana gospider paramspider arjun ffuf gobuster feroxbuster
+dalfox kxss sqlmap nuclei msfconsole smuggler tplmap
+commix crlfuzz theharvester shodan gitleaks s3scanner fierce
+dnsrecon gf
+```
+Tools not available via `pacman`/`apt` are fetched automatically through `go install`, `pipx`, `cargo`, or `git clone`, depending on the tool.
+
+### How Dependency Installation Works
+No manual dependency setup is needed — everything happens automatically on first run:
+
+1. Run `sudo python3 cassiopeia.py` (root required)
+2. The launcher verifies the signature, decodes `cassiopeia.sh`, and hands off execution to it
+3. `cassiopeia.sh` runs `detect_os()` to pick the right package manager (`pacman` for Arch-based, `apt` for Debian-based)
+4. It checks every tool in `TOOLS_LIST` against what's already installed, and for anything missing:
+   - Installs it from the distro's official repo (`pacman`/`apt`) if available there
+   - Otherwise falls back to `go install`, `pipx install`, `cargo install`, or `git clone`, per-tool, as defined in the script's tool manifest
+5. Once all tools are resolved, the OPSEC and pentest phases begin
+
+If you'd rather pre-install everything yourself before running Cassiopeia, install the tool list above via your distro's package manager plus `go`, `pipx`, and `cargo` for whatever isn't packaged natively.
+
+---
+
+## 🔒 Signed Launcher — How Distribution Works
+
+Cassiopeia ships as a **signed, encoded artifact**, not a plaintext script:
+
+| File | Purpose |
+|------|---------|
+| `cassiopeia.py` | Launcher. Has a GPG public key embedded at build time. Locates/downloads `cassiopeia.sh.enc` + `cassiopeia.sh.enc.sig`, verifies the signature against the embedded key, and only then decodes and executes the script. |
+| `cassiopeia.sh.enc` | The obfuscated/encoded pentest script — safe to publish. |
+| `cassiopeia.sh.enc.sig` | Detached GPG signature for the `.enc` file. |
+| `pubkey.asc` | The maintainer's public key (same one embedded in `cassiopeia.py`), published for reference/verification. |
+| `cassiopeia.sh` | Plaintext source of truth. **Not published** — kept private by the maintainer, only distributed as `.enc`/`.sig`. |
+| `encode_and_sign.py` | Maintainer-only tool: encodes + signs `cassiopeia.sh` to produce the `.enc`/`.sig` pair after each update. |
+
+**Why this matters:** if the GitHub repo is ever compromised and an attacker swaps in a malicious `.enc`/`.sig` pair signed with their own key, the launcher still refuses to run it — it only trusts the single public key embedded in `cassiopeia.py` at distribution time, not whatever key shows up in the repo. Because of this, `cassiopeia.py` itself is **not auto-updated** from GitHub; get it once through a channel you trust rather than re-pulling it on every run.
+
+If signature verification fails, the launcher exits immediately with an error — no pentest code is ever executed. See [`SETUP.md`](SETUP.md) for the full maintainer setup/signing workflow and a tamper-test procedure.
 
 ---
 
@@ -124,26 +155,13 @@ git clone https://github.com/Xyra77/Cassiopeia.git
 cd Cassiopeia
 ```
 
-### 2. Make Executable
-```bash
-chmod +x cassiopeia.py
-```
-
-### 3. Install System Dependencies
-```bash
-sudo pacman -S --noconfirm --needed base-devel git python python-pip nodejs npm
-```
-
-### 4. Install Python Dependencies
-```bash
-pip3 install requests cloudscraper playwright reportlab weasyprint
-playwright install chromium
-```
-
-### 5. Run Cassiopeia (via Python Launcher)
+### 2. Run the Launcher
 ```bash
 sudo python3 cassiopeia.py
 ```
+The launcher looks for `cassiopeia.sh.enc` locally, downloads it from GitHub if missing, verifies its signature against the embedded public key, then decodes and runs it. On first successful run, Cassiopeia detects your OS/package manager, checks the tool list, and auto-installs anything missing before starting the OPSEC and pentest sections.
+
+> Advanced/offline use: if you already hold the plaintext `cassiopeia.sh` yourself, it can also be run directly with `sudo bash cassiopeia.sh` — this skips signature verification, so only do this with a copy you trust.
 
 ---
 
@@ -152,34 +170,13 @@ sudo python3 cassiopeia.py
 ### Basic Scan
 ```bash
 sudo python3 cassiopeia.py
-# Enter target URL when prompted
 ```
 
-### Resume Interrupted Scan
+### Resume an Interrupted Scan
 ```bash
-sudo python3 cassiopeia.py pentest_target.com_20250101_120000
+sudo python3 cassiopeia.py pentest_target.com_20260101_120000
 ```
-
-### With Config File
-```bash
-# Edit config first
-nano ~/.cassiopeia.conf
-
-# Then run
-sudo python3 cassiopeia.py
-```
-
-### Target URL Format
-```
-https://target.com
-https://www.target.com
-http://subdomain.target.com
-```
-
-### Launcher Help
-```bash
-python3 cassiopeia.py --help
-```
+Pass the existing output directory as the first argument — Cassiopeia reads the target URL and last completed phase from `master_log.txt` inside it and picks up where it left off.
 
 ---
 
@@ -187,92 +184,41 @@ python3 cassiopeia.py --help
 
 ```
 pentest_target.com_YYYYMMDD_HHMMSS/
-├── opsec/                  # Tor, ProxyChains, MAC spoof status
-├── recon/                  # Subdomains, live hosts, WAF, fingerprints
-├── osint/                  # OSINT data (theHarvester, Shodan, GitLeaks)
-├── ports/                  # Nmap, Masscan, SSL/TLS results
-├── params/                 # URLs, parameters, GF patterns
-├── dirs/                   # Directory fuzzing results
-├── xss/                    # XSS findings (Dalfox, KXSS, Browser)
-├── sqli/                   # SQLMap output
-├── ssrf/                   # SSRF candidates
-├── lfi/                    # LFI / Path Traversal
-├── ssti/                   # SSTI / XXE / RCE
-├── cors/                   # CORS misconfiguration
-├── smuggling/              # HTTP Smuggling
-├── jwt/                    # JWT tokens & brute results
-├── graphql/                # GraphQL endpoints & tests
-├── vulns/                  # Nuclei findings
-├── metasploit/             # Metasploit scan output
-├── prototype_pollution/    # Prototype pollution findings
-├── code_injection/         # PHP, Python, NodeJS injection
-├── browser_xss/            # Headless browser XSS results
-├── js_analysis/            # JavaScript secrets & sinks
-├── auth/                   # 403 bypass, race condition, password spray
-├── api/                    # API discovery & versioning
-├── screenshots/            # Live host screenshots
-├── report/                 # HTML & PDF reports
-└── master_log.txt          # Full scan log
+├── recon/                   # Subdomains, live hosts, WAF, fingerprints
+├── osint/                   # OSINT data (theHarvester, Shodan, GitLeaks)
+├── ports/                   # Nmap, Masscan, SSL/TLS results
+├── params/                  # URLs, parameters, GF patterns
+├── dirs/                    # Directory/file fuzzing results
+├── xss/                     # XSS findings (Dalfox, KXSS, browser-verified)
+├── sqli/                    # SQLMap output
+├── ssrf/                    # SSRF candidates
+├── lfi/                     # LFI / path traversal
+├── ssti/                    # SSTI / XXE / RCE
+├── cors/                    # CORS misconfiguration
+├── jwt/                     # JWT tokens & brute-force results
+├── graphql/                 # GraphQL endpoints & tests
+├── vulns/                   # Nuclei findings
+├── metasploit/              # Metasploit scan output
+├── prototype_pollution/     # Prototype pollution findings
+├── code_injection/          # PHP, Python, NodeJS injection
+├── browser_xss/             # Headless browser XSS results
+├── js_analysis/             # JavaScript secrets & sinks
+├── auth/                    # 403 bypass, race condition, password spray
+├── api/                     # API discovery & versioning
+├── screenshots/             # Live host screenshots
+├── report/                  # HTML & PDF reports
+└── master_log.txt           # Full scan log (also used for resume)
 ```
 
 ---
 
-## ⚙️ Configuration
+## 🔗 Caido Integration Details
 
-Edit `~/.cassiopeia.conf` to customize:
-
-```bash
-# Scan Settings
-MAX_SCAN_SECONDS=21600        # 6 hours max
-DEFAULT_TIMEOUT=30
-MAX_THREADS=50
-
-# Tor Settings
-TOR_ENTRY_NODES=""
-TOR_EXIT_NODES=""
-
-# Tool Settings
-SQLMAP_LEVEL=3
-SQLMAP_RISK=2
-NUCLEI_RATE_LIMIT=100
-DALFOX_WORKERS=30
-FFUF_THREADS=80
-
-# Report Settings
-GENERATE_PDF=1
-AUTO_OPEN_REPORT=0
-
-# Caido Integration
-CAIDO_PROXY_PORT=8080
-CAIDO_GUI_PORT=7777
-CAIDO_AUTO_SEND=1
-```
-
----
-
-## 📊 Report Sample
-
-The HTML report includes:
-- Severity Summary Cards (Critical, High, Medium, Low, Info)
-- Risk Distribution Donut Chart
-- Vulnerability Type Breakdown
-- OWASP Top 10 2021 Mapping
-- CVSS Score Distribution
-- Detailed Findings per Category
-- Remediation Recommendations
-- Manual Verification Checklist
-- Caido Integration Buttons
-
----
-
-## 🔗 Caido Integration
-
-Cassiopeia automatically sends all discovered URLs and verified findings to **Caido Proxy** for manual testing:
-
-1. All URLs replayed through Caido proxy (127.0.0.1:8080)
-2. Verified findings tagged with `X-Cassiopeia-Source: verified-finding`
-3. Caido GUI auto-opens at `http://127.0.0.1:7777`
-4. Filter by priority in Caido History tab
+1. Cassiopeia checks for a running Caido instance at `127.0.0.1:8080` and offers to start it if not found
+2. All discovered URLs are replayed through the Caido proxy for manual review
+3. Verified findings (XSS, LFI, SSRF, 403 bypass, API endpoints) are sent with header `X-Cassiopeia-Source: verified-finding`
+4. Caido GUI auto-opens at `http://127.0.0.1:7777`
+5. Filter by `X-Cassiopeia-Source: verified-finding` in the Caido History tab for priority findings
 
 ---
 
@@ -298,60 +244,35 @@ Cassiopeia automatically sends all discovered URLs and verified findings to **Ca
 
 ---
 
+## 🔧 Maintainer: Releasing an Update
+
+Only relevant if you're Xyra77 pushing a new version, not for end users.
+
+```bash
+# After editing the private cassiopeia.sh:
+python3 encode_and_sign.py cassiopeia.sh --key "your-gpg-key-email"
+# -> produces cassiopeia.sh.enc + cassiopeia.sh.enc.sig
+```
+Upload only `cassiopeia.sh.enc` and `cassiopeia.sh.enc.sig` to the repo. Never commit plaintext `cassiopeia.sh`, and never commit the private GPG key. Full setup, key generation, and a tamper-test procedure are in [`SETUP.md`](SETUP.md).
+
+---
+
 ## 📄 License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
-
-```
-MIT License
-
-Copyright (c) 2025 Xyra77
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
 
 ---
 
 ## 📞 Support
 
-- **Issues:** Xyra77@proton.me
-- **Updates:** Check repository for latest version
+- **Repository:** [github.com/Xyra77/Cassiopeia](https://github.com/Xyra77/Cassiopeia.git)
 - **Community:** For educational discussion only
 
 ---
 
 ## 🙏 Acknowledgments
 
-Thanks to all open-source tool developers whose projects are integrated into Cassiopeia:
-- ProjectDiscovery (Nuclei, Subfinder)
-- SQLMap Team
-- Metasploit Framework
-- OWASP Foundation
-- And many more...
-
----
-
-## 📌 Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 4.0.0 | 2026 March | Full rewrite, 15 phases, Caido integration, HTML/PDF report, Python launcher |
-| 3.0.0 | 2025 December | Added browser XSS, prototype pollution, race condition |
-| 2.0.0 | 2025 November | Added Nuclei, Metasploit automation |
-| 1.0.0 | 2025 July | Initial release |
+Thanks to all open-source tool developers whose projects are integrated into Cassiopeia — ProjectDiscovery (Nuclei, Subfinder, Httpx, Katana...), SQLMap, Metasploit, OWASP, and the many others behind the 40+ tools this framework orchestrates.
 
 ---
 
@@ -359,6 +280,5 @@ Thanks to all open-source tool developers whose projects are integrated into Cas
 
 ---
 
-**Developer:** Xyra77  
-**Last Updated:** 2026  
+**Developer:** Xyra77
 **Status:** Cyber Security Enthusiast

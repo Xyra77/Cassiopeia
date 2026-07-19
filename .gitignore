@@ -3,6 +3,13 @@
 #   DO NOT UPLOAD SCAN RESULTS & SENSITIVE DATA!
 # ================================================================
 
+# ── PLAINTEXT SOURCE (NEVER PUBLISH -- signed-launcher model) ──
+# The obfuscated/encoded + signed pair (cassiopeia.sh.enc + .sig)
+# is what gets published. The plaintext script is the private
+# source of truth and must never be committed.
+cassiopeia.sh
+encode_and_sign.py
+
 # ── PENTEST OUTPUT (REQUIRED!) ──────────────────────────────────
 pentest_*/
 pentest_*_*/

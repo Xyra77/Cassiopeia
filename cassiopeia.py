@@ -1,17 +1,178 @@
-import sys,os
-if os.geteuid()!=0:
+#!/usr/bin/env python3
+"""
+Cassiopeia Launcher (v2 -- signed & verified)
+
+- Cari cassiopeia.sh.enc + cassiopeia.sh.enc.sig lokal
+- Kalau gak ada / ada versi baru di GitHub -> download keduanya
+- Verifikasi signature GPG pakai public key yang di-embed di bawah
+  (bukan public key yang didownload -- itu kunci: attacker yang
+  compromise repo GitHub TETAP GAK BISA bikin signature valid,
+  karena private key gak pernah ada di repo/server manapun)
+- Kalau signature valid -> decode di memory -> jalanin via bash
+- Kalau signature invalid / gak ada -> REFUSE, gak dijalanin sama sekali
+"""
+
+import base64
+import codecs
+import hashlib
+import os
+import subprocess
+import sys
+import tempfile
+import urllib.request
+import zlib
+
+if os.geteuid() != 0:
     print("[!] Must be run as root!")
     print(f"[>] sudo python3 {os.path.basename(__file__)}")
     sys.exit(1)
 
-class _G(Exception):pass
-_P=bytes.fromhex("322c190601741f703a3b5e12005e2626012e0d232b5a37573f2f5c17110e2a0b013b1d2728047b090f1c5d1d0d213a0e5e08350523273e0e3d0f185b181026595b5b680736233f03563b0245051d530f1f022c162e2d38331f2b061e3d29333519415a6d041c33567f1738080f2811042d310a0a4f0c3f1758353d3a0b58753872042828080d0219053903373d2d2032310d112101090e0100003f291c2541083c1a27042a3f15190519794a2b465c3e1d1001281c021c035921130d23070d1b1d4a37581a08212b095e5c3a3a355c3b3d0a53040d59741a76132f2668310b421d020311331d071c1207103d664806190d261a543a3a1c3a18133c0c2a0f1f212d3f1f10270019586f123418391d1470393e4630063c03347b09071c5b3b183d04391925362a27375a0953262403213b132b343e310c0d593c224f2033031c6f5555002d044d6d5e2f1a14525b035b0f3275130f3e6055192d187c016d08192861262f08232c2a6d5b3f592b012f010b191a092a5d001e53271a25172177515b2a0834012b197c3c0d2f160d6f362f3b28022f2d020b3860561b591f74110b5e260403213a013b0c0b215a1b2f6b14382c23023b0a1158250a551e392b1720295d0f1060071f135d142a312f0a5b105c1b1d3d14297a5b230a131f5c1e5d251674083d39294a25310d7e3f105a581114062e2426753b7a2f373f0e2f0719380629083a061d2317140e243e21341c591c72200f310b272d2d3b365d0c373d2a583949745e59026f545f5a230e1a101b190e1108251120341b100f2a2e323f432236272b710816042008033a057d28765c1e383002011d3d352d752e3c5a0e36472b243d123507051f6d2c36235a0a0121585d1e0950024617250018073c0e2b5403203f253f005b060201280f075d0341742a002a315d2e2e05750b355d23333a1f05002d14383402063f211f5d5d39272d695b452c0a09060a181e3629251b3f132c290f377b0b060e235b172e2f105e020e2b2d1a0f2f1d380c0f0e3206513f10761108250a251d04303f0c6e373b4237392b2d39393f2b2f020e26094e2625002f1a3f5c062b0003155a3e283f17472429250d371f231d1f0a59330b3a15041f3d3e0d3f0e1f5e2056103a022d33302b230f071027461f05603c04583734010b26200c3d320f310c1b150f1028111c2e04390a082a23272b333a233d2d167b2e713b0a23205d5d202f1c1d32243a4608513c1d36370977034502123d081f1b032914111930292f591f172b12335a5c380c0b1a5b260a0370461b080d07025d412b122113340003301e2245370f77250a0b1611051a383a5673202b0f102e581b1e0035231026500f1d3801051a170c2214020a0f5d0b280b1817065625212e47512a21312f3c1f1a1030231a363d4075313a2e3400235a41034e73265a1a3e4a142b1a0e132a2d2b0c6d0a071c5a0f3f721f1822602a293c391f1f1a3d21283b0d5f0541744e0e5f0a583a083b392609400c332f1814283b2008155201300d2f16010e2f1d7d142e2808100e305a51162e21312439582e4a3b0a282230301158301d2d0e10027b3534205c20155c260b2609103b0305203c552b5a3c0e490c502f2808311c51451f37700a24111731273b01373d183b0638762a1d3a3e1e340d00381f0d52141e0a01302d3d17383406162a017b401223015d690b585c3c1a4b245a050d0004273d2f622d162326421211431b3b6231175e1f190a271942243e35242c02196853160d272f3e11255b3f6e375d2b16353535252a582c282046452c2118221451140007043b170b73065e5f380c5f3c04271f1b1b0425721f3e3e343c2e28255a203f2a25330a221a0d422a2d1d531822037f3832582f2b00041b1923153c0c001b5f1c112d380918382959570b0b293b200d231a0f235c251601011005050b21241410313c092026060833212d1e1f260f30143411245e1a041c0c0b5d21353813111d25232f19261f0c352e1b3f0c2313060e0b0a15080e5a1b3b201e2d1e3c4d173f18031835092d260921351c1939365d2a2536153c3231392616133f2f363a00702a5e1a1e281628590e2e32313b080315431c00284c70033803683f082116202b0b2f1f3f3517341f067f01281037073e172a510b2208005a0a5d1e24060027062e120e253e3708221d29192f30113d3b2d2e5b062b09352959260a21223e2724011a3703172f0c2d092b340b3f112e2027213f3e383b2b0836022f5f0b002451090a3a2e5e2c200d102933370f01300e2650351f5902367a0e3a3823102827263c36024a0d5034183a00210802344b21221e0c680005331828002b1a0f516f1703045927566946280f1a2847223a18483b0f245d6f2d1519221f0d250e1c5811513b0e5b753a380e41012a0a2f190b25202b025e1e092601503d0000742b160a764e010417023b69461607311d5c1d56030334210f2f1a24382b2d7d36362f0f316c34021a2a1b14271107382f20475c08742f382b3e0b2c5c3d382c2b38701f193a333525283c350b69000c2f60022b08412849725c1b201b0f58595a200c282e3400292139023d3b0d0c033924012c0107232c3274131c263454360d5d2630185d24330c0b09271b030a3b135c501420282e01780c2d5a1e27030c18311c660821110b2115373f050607092a5e5b076b5c1e233421217a503d0d182c2a3957042d06063451682d2238030b0a2a302a2a360916511728342e5a2f5f1c555f03410417075b2a28611400510d2256313f3c0429061b1323044d1b1c222f290a3f0a1f18340f232c06760a02105821132c3d141a68245f26280b160f1f081d1e045c190c03110c273920171f2227391b5224013e3d35260f3a29784f2f1e412e60233e190c2741363c5e3d28020d30032f2c1858245d32242427031c49260f571815152d5f0b3a340b3e271f6f2f155a1c2f3b2f3d071d33082859297b2a7b073a5e2a305c185d2241155e0d2a2a0d1a0d59181d20580f233c0e151a5c1b0b71273d1e3c13042c58221b045800063c09045e0a25030f132c3d3154070c5670")
-try:raise _G(0)
-except _G:
-    d=_P
-    _k=bytes.fromhex("59656c696e4d7942696e69")
-    d=bytes(b^_k[i%len(_k)]for i,b in enumerate(d))
-    d=__import__('codecs').decode(d.decode('latin-1'),'rot_13').encode('latin-1')
-    d=__import__('base64').b64decode(d)
-    d=__import__('zlib').decompress(d,-15)
-    exec(d.decode('utf-8'))
+# ── CONFIG ────────────────────────────────────────────
+GITHUB_USER = "Xyra77"
+GITHUB_REPO = "Cassiopeia"
+ENC_FILE    = "cassiopeia.sh.enc"
+SIG_FILE    = "cassiopeia.sh.enc.sig"
+
+RAW_ENC_URL = f"https://raw.githubusercontent.com/{GITHUB_USER}/{GITHUB_REPO}/main/{ENC_FILE}"
+RAW_SIG_URL = f"https://raw.githubusercontent.com/{GITHUB_USER}/{GITHUB_REPO}/main/{SIG_FILE}"
+
+XOR_KEY = bytes.fromhex("59656c696e4d7942696e69")
+
+# ── EMBEDDED PUBLIC KEY ───────────────────────────────
+# GANTI blok ini dengan hasil: gpg --armor --export YOUR_KEY_ID
+# Ini yang bikin verifikasi "nyata" -- attacker yang cuma bisa nulis
+# ke repo GitHub TIDAK bisa sign ulang tanpa private key kamu.
+EMBEDDED_PUBKEY = """-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mDMEalzXPRYJKwYBBAHaRw8BAQdA3pbOHFbwKHqZ1B2AqMQOUmuGnsGLkoJqNits
+Q28Ewie0Ilh5cmE3NyA8eHlyYTc3Lm9mZmljaWFsQGdtYWlsLmNvbT6IkAQTFgoA
+OBYhBDTkKx2PHxd20dKe+hizSkLGByzgBQJqXNc9AhsDBQsJCAcCBhUKCQgLAgQW
+AgMBAh4BAheAAAoJEBizSkLGByzgT24BAJMynGf/PLRyWxbZ9jY1fEwVMxy4kR+p
+ddnV9MBsMiJTAQDEICtWVF5rN8pz7JonEFHJNb1Tf58/POnR/AXz//LfCrg4BGpc
+1z0SCisGAQQBl1UBBQEBB0D6nv1MQchpEvmGavLqjUIKcFlk4LLPS2cv9i2C5fgE
+QwMBCAeIeAQYFgoAIBYhBDTkKx2PHxd20dKe+hizSkLGByzgBQJqXNc9AhsMAAoJ
+EBizSkLGByzgNoYA/ipLXGpJ/7pzmpWKCWbRI+NrDJIIJEz6RTEzzjphW8IuAP9k
+KKxJPp3JMAvT0onHD6fIdxaLl1avi0f4GTjn0vsiDA==
+=muQJ
+
+-----END PGP PUBLIC KEY BLOCK-----"""
+
+
+def fetch_bytes(url: str, timeout=20) -> bytes:
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return r.read()
+
+
+def find_local(name: str):
+    base = os.path.dirname(os.path.abspath(__file__))
+    for d in (base, os.getcwd()):
+        p = os.path.join(d, name)
+        if os.path.isfile(p):
+            return p
+    return None
+
+
+def verify_signature(enc_data: bytes, sig_data: bytes) -> bool:
+    """Verify detached GPG signature pakai embedded public key SAJA
+    (bukan key hasil download), pakai keyring temporer yang dibuang
+    setelah selesai."""
+    with tempfile.TemporaryDirectory() as gnupg_home:
+        os.chmod(gnupg_home, 0o700)
+        env = os.environ.copy()
+        env["GNUPGHOME"] = gnupg_home
+
+        r = subprocess.run(
+            ["gpg", "--batch", "--import"],
+            input=EMBEDDED_PUBKEY.encode(), env=env,
+            capture_output=True
+        )
+        if r.returncode != 0:
+            print("[X] Gagal import embedded public key -- launcher rusak/belum di-setup?")
+            print(r.stderr.decode(errors="replace"))
+            return False
+
+        with tempfile.NamedTemporaryFile(suffix=".enc", delete=False) as ef:
+            ef.write(enc_data)
+            enc_path = ef.name
+        with tempfile.NamedTemporaryFile(suffix=".sig", delete=False) as sf:
+            sf.write(sig_data)
+            sig_path = sf.name
+
+        try:
+            r = subprocess.run(
+                ["gpg", "--batch", "--verify", sig_path, enc_path],
+                env=env, capture_output=True
+            )
+            return r.returncode == 0
+        finally:
+            os.unlink(enc_path)
+            os.unlink(sig_path)
+
+
+def deobfuscate(data: bytes) -> str:
+    unxored = bytes(b ^ XOR_KEY[i % len(XOR_KEY)] for i, b in enumerate(data))
+    unrot = codecs.decode(unxored.decode('latin-1'), 'rot_13').encode('latin-1')
+    unb64 = base64.b64decode(unrot)
+    plain = zlib.decompress(unb64, -15)
+    return plain.decode('utf-8')
+
+
+def run_script_source(src: str, args: list) -> int:
+    """Tulis ke file temp mode 0700 (bukan world-readable), jalanin,
+    lalu hapus -- jadi plaintext gak nongkrong lama di disk."""
+    fd, path = tempfile.mkstemp(suffix=".sh", prefix="cassiopeia-")
+    try:
+        os.write(fd, src.encode('utf-8'))
+        os.close(fd)
+        os.chmod(path, 0o700)
+        print(f"[>] Signature valid -- menjalankan script terverifikasi...")
+        return subprocess.run(["bash", path] + args).returncode
+    finally:
+        try:
+            os.remove(path)
+        except OSError:
+            pass
+
+
+def main():
+    args = sys.argv[1:]
+    local_enc = find_local(ENC_FILE)
+    local_sig = find_local(SIG_FILE)
+
+    print("╔══════════════════════════════════════╗")
+    print("║      Cassiopeia Launcher (signed)    ║")
+    print(f"║  github.com/{GITHUB_USER}/{GITHUB_REPO:<14}  ║")
+    print("╚══════════════════════════════════════╝\n")
+
+    if local_enc and local_sig:
+        print(f"[+] Pakai file lokal: {local_enc}")
+        with open(local_enc, "rb") as f:
+            enc_data = f.read()
+        with open(local_sig, "rb") as f:
+            sig_data = f.read()
+    else:
+        print("[*] File lokal gak lengkap, download dari GitHub...")
+        try:
+            enc_data = fetch_bytes(RAW_ENC_URL)
+            sig_data = fetch_bytes(RAW_SIG_URL)
+        except Exception as e:
+            print(f"[X] Gagal download: {e}")
+            sys.exit(1)
+
+    print("[*] Verifikasi signature GPG...")
+    if not verify_signature(enc_data, sig_data):
+        print("[X] SIGNATURE TIDAK VALID -- script DITOLAK.")
+        print("    File ini mungkin sudah diubah/di-tamper dan BUKAN")
+        print("    berasal dari maintainer resmi. Cassiopeia tidak akan")
+        print("    dijalankan demi keamanan.")
+        sys.exit(1)
+    print(f"[+] Signature VALID (sha256 konten: {hashlib.sha256(enc_data).hexdigest()[:16]}...)")
+
+    src = deobfuscate(enc_data)
+    rc = run_script_source(src, args)
+    sys.exit(rc)
+
+
+if __name__ == "__main__":
+    main()
