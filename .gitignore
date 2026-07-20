@@ -87,3 +87,6 @@ unobfuscated/
 .vscode/
 *.sublime-project
 *.sublime-workspace
+*.zip
+theharvester.json
+theharvester.xml
