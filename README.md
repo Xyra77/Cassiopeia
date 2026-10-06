@@ -29,7 +29,7 @@
 **Repository:** [github.com/Xyra77/Cassiopeia](https://github.com/Xyra77/Cassiopeia.git)
 **Platform:** Arch-based Linux (primary) + Debian-based Linux (auto-detected)
 **License:** MIT License
-**Distribution:** Signed launcher (GPG-verified, tamper-proof execution)
+**Distribution:** Direct Bash execution
 
 ---
 
@@ -61,7 +61,7 @@
 
 ### 🧩 Advanced Pentest Addons (Section 3)
 - Addon A — Prototype Pollution detection
-- Addon B — Code Injection (PHP, Python, NodeJS)
+- Addon B — Code Injection (PHP, NodeJS)
 - Addon C — Real Browser XSS verification (headless Playwright)
 - Addon D — JavaScript Secret Hunting (API keys, tokens, credentials)
 - Addon F — CVE Correlation
@@ -82,7 +82,7 @@
 
 ### ⚡ Smart Features
 - Auto OS detection (Arch-based vs Debian-based) with matching package manager (`pacman` / `apt`)
-- Auto-install missing tools via native package repos, with `go install` / `pipx` / `cargo` / `git clone` fallbacks
+- Auto-install missing tools via native package repos, with `go install` / `cargo` / `git clone` fallbacks
 - Resume mode — continue an interrupted scan from its existing output directory
 - Colorized, phased console output with per-phase notifications
 
@@ -98,9 +98,10 @@
 ### Permissions
 - **Root access** (`sudo`) required for full functionality
 
-### Launcher Requirements
-- **Python 3** (runs `cassiopeia.py`)
-- **GPG** (`gnupg`) available on `PATH` — used by the launcher to verify the script signature before execution
+### Runtime Requirements
+- **Bash**
+- **sudo** for privileged operations
+- Standard Unix utilities required by the integrated tools
 
 ### Dependencies (auto-installed on first run)
 ```
@@ -111,39 +112,45 @@ dalfox kxss sqlmap nuclei msfconsole smuggler tplmap
 commix crlfuzz theharvester shodan gitleaks s3scanner fierce
 dnsrecon gf
 ```
-Tools not available via `pacman`/`apt` are fetched automatically through `go install`, `pipx`, `cargo`, or `git clone`, depending on the tool.
+Tools not available via `pacman`/`apt` are fetched automatically through `go install`, `cargo`, or `git clone`, depending on the tool.
 
 ### How Dependency Installation Works
-No manual dependency setup is needed — everything happens automatically on first run:
 
-1. Run `sudo python3 cassiopeia.py` (root required)
-2. The launcher verifies the signature, decodes `cassiopeia.sh`, and hands off execution to it
-3. `cassiopeia.sh` runs `detect_os()` to pick the right package manager (`pacman` for Arch-based, `apt` for Debian-based)
-4. It checks every tool in `TOOLS_LIST` against what's already installed, and for anything missing:
-   - Installs it from the distro's official repo (`pacman`/`apt`) if available there
-   - Otherwise falls back to `go install`, `pipx install`, `cargo install`, or `git clone`, per-tool, as defined in the script's tool manifest
-5. Once all tools are resolved, the OPSEC and pentest phases begin
 
-If you'd rather pre-install everything yourself before running Cassiopeia, install the tool list above via your distro's package manager plus `go`, `pipx`, and `cargo` for whatever isn't packaged natively.
+On first run:
+
+1. Run `sudo bash cassiopeia.sh`.
+2. `cassiopeia.sh` detects the operating-system family through `/etc/os-release`.
+3. It selects `pacman` for Arch-based systems or `apt` for Debian-based systems.
+4. It checks the configured tool list against the local system.
+6. Once dependencies are available, the OPSEC and pentest phases begin.
+
+If you'd rather pre-install everything yourself, install the required tools
+through your distribution's package manager and the supported native/upstream
+installation methods.
 
 ---
 
-## 🔒 Signed Launcher — How Distribution Works
+## ▶️ Direct Bash Execution
 
-Cassiopeia ships as a **signed, encoded artifact**, not a plaintext script:
 
 | File | Purpose |
 |------|---------|
-| `cassiopeia.py` | Launcher. Has a GPG public key embedded at build time. Locates/downloads `cassiopeia.sh.enc` + `cassiopeia.sh.enc.sig`, verifies the signature against the embedded key, and only then decodes and executes the script. |
-| `cassiopeia.sh.enc` | The obfuscated/encoded pentest script — safe to publish. |
-| `cassiopeia.sh.enc.sig` | Detached GPG signature for the `.enc` file. |
-| `pubkey.asc` | The maintainer's public key (same one embedded in `cassiopeia.py`), published for reference/verification. |
-| `cassiopeia.sh` | Plaintext source of truth. **Not published** — kept private by the maintainer, only distributed as `.enc`/`.sig`. |
-| `encode_and_sign.py` | Maintainer-only tool: encodes + signs `cassiopeia.sh` to produce the `.enc`/`.sig` pair after each update. |
+| `cassiopeia.sh` | Main Cassiopeia runtime and entry point |
 
-**Why this matters:** if the GitHub repo is ever compromised and an attacker swaps in a malicious `.enc`/`.sig` pair signed with their own key, the launcher still refuses to run it — it only trusts the single public key embedded in `cassiopeia.py` at distribution time, not whatever key shows up in the repo. Because of this, `cassiopeia.py` itself is **not auto-updated** from GitHub; get it once through a channel you trust rather than re-pulling it on every run.
+The official runtime command is:
 
-If signature verification fails, the launcher exits immediately with an error — no pentest code is ever executed. See [`SETUP.md`](SETUP.md) for the full maintainer setup/signing workflow and a tamper-test procedure.
+```bash
+sudo bash cassiopeia.sh
+```
+
+Cassiopeia executes its phases directly from `cassiopeia.sh`, including OS
+detection, dependency checks, reconnaissance, scanning, validation, reporting,
+and optional Caido integration.
+
+------|---------|
+
+
 
 ---
 
@@ -159,9 +166,9 @@ cd Cassiopeia
 ```bash
 sudo bash cassiopeia.sh
 ```
-The launcher looks for `cassiopeia.sh.enc` locally, downloads it from GitHub if missing, verifies its signature against the embedded public key, then decodes and runs it. On first successful run, Cassiopeia detects your OS/package manager, checks the tool list, and auto-installs anything missing before starting the OPSEC and pentest sections.
-
-> Advanced/offline use: if you already hold the plaintext `cassiopeia.sh` yourself, it can also be run directly with `sudo bash cassiopeia.sh` — this skips signature verification, so only do this with a copy you trust.
+Cassiopeia executes directly from `cassiopeia.sh`. On startup it detects the
+OS/package manager, checks the tool list, and auto-installs missing
+dependencies before starting the OPSEC and pentest sections.
 
 ---
 
@@ -200,7 +207,6 @@ pentest_target.com_YYYYMMDD_HHMMSS/
 ├── vulns/                   # Nuclei findings
 ├── metasploit/              # Metasploit scan output
 ├── prototype_pollution/     # Prototype pollution findings
-├── code_injection/          # PHP, Python, NodeJS injection
 ├── browser_xss/             # Headless browser XSS results
 ├── js_analysis/             # JavaScript secrets & sinks
 ├── auth/                    # 403 bypass, race condition, password spray
@@ -243,17 +249,6 @@ pentest_target.com_YYYYMMDD_HHMMSS/
 5. **Comply with Laws** — Understand local cybersecurity laws (UU ITE, CFAA, etc.)
 
 ---
-
-## 🔧 Maintainer: Releasing an Update
-
-Only relevant if you're Xyra77 pushing a new version, not for end users.
-
-```bash
-# After editing the private cassiopeia.sh:
-python3 encode_and_sign.py cassiopeia.sh --key "your-gpg-key-email"
-# -> produces cassiopeia.sh.enc + cassiopeia.sh.enc.sig
-```
-Upload only `cassiopeia.sh.enc` and `cassiopeia.sh.enc.sig` to the repo. Never commit plaintext `cassiopeia.sh`, and never commit the private GPG key. Full setup, key generation, and a tamper-test procedure are in [`SETUP.md`](SETUP.md).
 
 ---
 
