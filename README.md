@@ -157,7 +157,7 @@ cd Cassiopeia
 
 ### 2. Run the Launcher
 ```bash
-sudo python3 cassiopeia.py
+sudo bash cassiopeia.sh
 ```
 The launcher looks for `cassiopeia.sh.enc` locally, downloads it from GitHub if missing, verifies its signature against the embedded public key, then decodes and runs it. On first successful run, Cassiopeia detects your OS/package manager, checks the tool list, and auto-installs anything missing before starting the OPSEC and pentest sections.
 
@@ -169,12 +169,12 @@ The launcher looks for `cassiopeia.sh.enc` locally, downloads it from GitHub if 
 
 ### Basic Scan
 ```bash
-sudo python3 cassiopeia.py
+sudo bash cassiopeia.sh
 ```
 
 ### Resume an Interrupted Scan
 ```bash
-sudo python3 cassiopeia.py pentest_target.com_20260101_120000
+sudo bash cassiopeia.sh pentest_target.com_20260101_120000
 ```
 Pass the existing output directory as the first argument — Cassiopeia reads the target URL and last completed phase from `master_log.txt` inside it and picks up where it left off.
 
