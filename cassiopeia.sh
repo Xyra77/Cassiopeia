@@ -458,9 +458,7 @@ try:
     with os.fdopen(_fd,"wb") as _tf:
         _tf.write(_r)
         _tf.flush()
-
-    # stdin Python sedang terikat ke heredoc __PYEOF__, jadi jangan
-    # mewariskannya ke payload. Ambil stdin interaktif langsung dari TTY.
+        
     _tty_fd=None
     try:
         _tty_fd=os.open("/dev/tty", os.O_RDWR)
